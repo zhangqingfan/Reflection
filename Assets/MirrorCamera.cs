@@ -5,12 +5,10 @@ using UnityEngine;
 
 public class MirrorCamera : MonoBehaviour
 {
-    public RenderTexture RT;
     public RenderTexture targetTexture;
     public Camera mainCamera;
     Plane mirrorPlane;
     Camera newCamera;
-
 
     void Start()
     {
@@ -28,6 +26,7 @@ public class MirrorCamera : MonoBehaviour
         mirrorCamera.transform.position = mirrorCameraPos;
         newCamera = mirrorCamera.AddComponent<Camera>();
         newCamera.CopyFrom(mainCamera);
+        newCamera.cullingMask = LayerMask.GetMask("reflection");  //must have different layer with main camera
 
         var angle = Vector3.Dot(cameraFace, planeNormal);
         var touchPoint = GetIntersectWithLineAndPlane(cameraPos, cameraFace, transform.position, planeNormal);
@@ -60,16 +59,6 @@ public class MirrorCamera : MonoBehaviour
 
     private void OnWillRenderObject()
     {
-        //return;
-        /*newCamera.clearFlags = mainCamera.clearFlags;
-        newCamera.backgroundColor = mainCamera.backgroundColor;
-        newCamera.fieldOfView = mainCamera.farClipPlane;
-        newCamera.nearClipPlane = mainCamera.nearClipPlane;
-        newCamera.fieldOfView = mainCamera.fieldOfView;
-        newCamera.aspect = mainCamera.aspect;
-        newCamera.orthographicSize = mainCamera.orthographicSize;*/
-        newCamera.cullingMask = LayerMask.GetMask("reflection"); //must have different layer with main camera
-
         var reflectMatrix = CalculateReflectMatrix(transform.up, transform.position - transform.up * 0.001f);
         newCamera.worldToCameraMatrix = mainCamera.worldToCameraMatrix * reflectMatrix;  //use mainCamera worldToCameraMatrix to render a flipped world
 
@@ -85,7 +74,11 @@ public class MirrorCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        //Time.timeScale = 2.5f;
+        //Debug.Log(Time.deltaTime);
+
         return;
+
         //newCamera.CopyFrom(mainCamera);
         newCamera.clearFlags = mainCamera.clearFlags;
         newCamera.backgroundColor = mainCamera.backgroundColor;
