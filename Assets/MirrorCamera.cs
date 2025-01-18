@@ -28,33 +28,8 @@ public class MirrorCamera : MonoBehaviour
         newCamera.CopyFrom(mainCamera);
         newCamera.cullingMask = LayerMask.GetMask("reflection");  //must have different layer with main camera
 
-        var angle = Vector3.Dot(cameraFace, planeNormal);
-        var touchPoint = GetIntersectWithLineAndPlane(cameraPos, cameraFace, transform.position, planeNormal);
-
-        /*if (angle == 0)
-            mirrorCamera.transform.forward = cameraFace;
-
-        else if (angle < 0)
-            mirrorCamera.transform.forward = (touchPoint - mirrorCameraPos).normalized;
-
-        else if(angle > 0)
-            mirrorCamera.transform.forward = (mirrorCameraPos - touchPoint).normalized;
-        */
-        //targetTexture = new RenderTexture(Screen.width, Screen.height, 24);
-        //targetTexture.format = RenderTextureFormat.ARGB32;
         Shader.SetGlobalTexture("_MirrorTexture", targetTexture);
-
         newCamera.targetTexture = targetTexture;
-        //newCamera.enabled = true;
-    }
-
-    Vector3 GetIntersectWithLineAndPlane(Vector3 linePoint, Vector3 lineDirect, Vector3 planePoint, Vector3 planeNormal)
-    {
-        lineDirect.Normalize();
-        planeNormal.Normalize();
-
-        var distance = Vector3.Dot(planePoint - linePoint, planeNormal) / Vector3.Dot(lineDirect, planeNormal);
-        return distance * lineDirect + linePoint;
     }
 
     private void OnWillRenderObject()
@@ -74,31 +49,7 @@ public class MirrorCamera : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Time.timeScale = 2.5f;
-        //Debug.Log(Time.deltaTime);
 
-        return;
-
-        //newCamera.CopyFrom(mainCamera);
-        newCamera.clearFlags = mainCamera.clearFlags;
-        newCamera.backgroundColor = mainCamera.backgroundColor;
-        newCamera.fieldOfView = mainCamera.farClipPlane;
-        newCamera.nearClipPlane = mainCamera.nearClipPlane;
-        newCamera.fieldOfView = mainCamera.fieldOfView;
-        newCamera.aspect = mainCamera.aspect;
-        newCamera.orthographicSize = mainCamera.orthographicSize;
-        newCamera.cullingMask = mainCamera.cullingMask;
-
-        var reflectMatrix = CalculateReflectMatrix(transform.up, transform.position - transform.up * 0.001f);
-        newCamera.worldToCameraMatrix = mainCamera.worldToCameraMatrix * reflectMatrix;  //use mainCamera worldToCameraMatrix to render a flipped world
-
-        newCamera.projectionMatrix = mainCamera.projectionMatrix;
-        var plane = CameraSpacePlane(mainCamera.worldToCameraMatrix, transform.position - transform.up * 0.001f, -transform.up); //-transform.up!!!!!!
-        newCamera.projectionMatrix = newCamera.CalculateObliqueMatrix(plane);
-
-        GL.invertCulling = true;
-        newCamera.Render();
-        GL.invertCulling = false;
     }
 
     Vector4 CameraSpacePlane(Matrix4x4 worldToCameraMatrix, Vector3 pos, Vector3 normal)
